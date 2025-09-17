@@ -192,46 +192,80 @@ const TicTacToe = () => {
     }
   }, [board, gameOver, isXNext, checkWinner, checkDraw]);
 
-  // AI move logic
-  const getBestMove = useCallback((board, aiPlayer, humanPlayer) => {
-    // Simple AI implementation - can be enhanced with minimax algorithm
+  // Minimax algorithm with alpha-beta pruning for perfect AI play
+  const minimax = useCallback((board, depth, isMaximizing, alpha, beta, aiPlayer, humanPlayer) => {
+    const result = checkWinner(board);
+    
+    // Base cases - return score if game is over
+    if (result.winner === aiPlayer) return { score: 10 - depth };
+    if (result.winner === humanPlayer) return { score: depth - 10 };
+    if (checkDraw(board)) return { score: 0 };
+    
     const emptyIndices = board.reduce((acc, cell, index) => {
       if (!cell) acc.push(index);
       return acc;
     }, []);
     
-    // Try to win
-    for (let i = 0; i < emptyIndices.length; i++) {
-      const index = emptyIndices[i];
-      const newBoard = [...board];
-      newBoard[index] = aiPlayer;
-      if (checkWinner(newBoard).winner === aiPlayer) {
-        return index;
+    if (isMaximizing) {
+      let bestScore = -Infinity;
+      let bestMove = -1;
+      
+      for (const index of emptyIndices) {
+        const newBoard = [...board];
+        newBoard[index] = aiPlayer;
+        const { score } = minimax(newBoard, depth + 1, false, alpha, beta, aiPlayer, humanPlayer);
+        
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = index;
+        }
+        
+        alpha = Math.max(alpha, bestScore);
+        if (beta <= alpha) break; // Beta cut-off
       }
-    }
-    
-    // Block opponent from winning
-    for (let i = 0; i < emptyIndices.length; i++) {
-      const index = emptyIndices[i];
-      const newBoard = [...board];
-      newBoard[index] = humanPlayer;
-      if (checkWinner(newBoard).winner === humanPlayer) {
-        return index;
+      
+      return { score: bestScore, index: bestMove };
+    } else {
+      let bestScore = Infinity;
+      let bestMove = -1;
+      
+      for (const index of emptyIndices) {
+        const newBoard = [...board];
+        newBoard[index] = humanPlayer;
+        const { score } = minimax(newBoard, depth + 1, true, alpha, beta, aiPlayer, humanPlayer);
+        
+        if (score < bestScore) {
+          bestScore = score;
+          bestMove = index;
+        }
+        
+        beta = Math.min(beta, bestScore);
+        if (beta <= alpha) break; // Alpha cut-off
       }
+      
+      return { score: bestScore, index: bestMove };
+    }
+  }, [checkWinner, checkDraw]);
+
+  // Get the best move using minimax
+  const getBestMove = useCallback((board, aiPlayer, humanPlayer) => {
+    // For the first move, take center or corner for optimal play
+    const emptyCount = board.filter(cell => cell === '').length;
+    if (emptyCount === 9) {
+      // First move - take center or corner
+      return [4, 0, 2, 6, 8][Math.floor(Math.random() * 5)];
     }
     
-    // Try to take center
-    if (board[4] === '') return 4;
-    
-    // Try to take corners
-    const corners = [0, 2, 6, 8];
-    const availableCorners = corners.filter(index => board[index] === '');
-    if (availableCorners.length > 0) {
-      return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+    // For the second move if center is taken
+    if (emptyCount === 8 && board[4] !== '') {
+      // Take a corner if center is taken by opponent
+      const corners = [0, 2, 6, 8];
+      return corners[Math.floor(Math.random() * corners.length)];
     }
     
-    // Take any available spot
-    return emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+    // Use minimax for all other moves
+    const { index } = minimax([...board], 0, true, -Infinity, Infinity, aiPlayer, humanPlayer);
+    return index;
   }, [checkWinner]);
 
   // Handle AI moves
