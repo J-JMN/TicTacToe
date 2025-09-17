@@ -2,7 +2,7 @@
 
 A modern, interactive Tic Tac Toe game built with Next.js, React, and CSS animations. Play against an AI opponent with adjustable difficulty levels or challenge a friend in local multiplayer mode.
 
-![Tic Tac Toe Screenshot](/public/screenshot.png)
+![Tic Tac Toe Screenshot](/public/game.png)
 
 ## Features
 
