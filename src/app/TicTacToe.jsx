@@ -727,7 +727,7 @@ const TicTacToe = () => {
             setIsAgainstAI(!isAgainstAI);
           }}
         >
-          {isAgainstAI ? 'Playing vs AI' : 'Playing vs Human'}
+          {isAgainstAI ? 'Playing vs AI' : 'Local 2-Player'}
         </button>
         
         <button 
