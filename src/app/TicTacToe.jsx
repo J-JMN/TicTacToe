@@ -193,7 +193,18 @@ const TicTacToe = () => {
   }, [board, gameOver, isXNext, checkWinner, checkDraw]);
 
   // Minimax algorithm with alpha-beta pruning for perfect AI play
-  const minimax = useCallback((board, depth, isMaximizing, alpha, beta, aiPlayer, humanPlayer) => {
+  // Added depthLimit parameter for medium difficulty
+  const minimax = useCallback((board, depth, isMaximizing, alpha, beta, aiPlayer, humanPlayer, depthLimit = false) => {
+    // For medium difficulty, use a more nuanced approach
+    if (depthLimit) {
+      // Use a dynamic depth limit based on game state
+      const emptyCount = board.filter(cell => cell === '').length;
+      if (depth >= (emptyCount > 4 ? 4 : 6)) {
+        // In early game, search deeper (up to 4-6 plies)
+        // In endgame, be more precise
+        return { score: evaluateBoard(board, aiPlayer, humanPlayer), index: -1 };
+      }
+    }
     const result = checkWinner(board);
     
     // Base cases - return score if game is over
@@ -213,7 +224,7 @@ const TicTacToe = () => {
       for (const index of emptyIndices) {
         const newBoard = [...board];
         newBoard[index] = aiPlayer;
-        const { score } = minimax(newBoard, depth + 1, false, alpha, beta, aiPlayer, humanPlayer);
+        const { score } = minimax(newBoard, depth + 1, false, alpha, beta, aiPlayer, humanPlayer, depthLimit);
         
         if (score > bestScore) {
           bestScore = score;
@@ -232,7 +243,7 @@ const TicTacToe = () => {
       for (const index of emptyIndices) {
         const newBoard = [...board];
         newBoard[index] = humanPlayer;
-        const { score } = minimax(newBoard, depth + 1, true, alpha, beta, aiPlayer, humanPlayer);
+        const { score } = minimax(newBoard, depth + 1, true, alpha, beta, aiPlayer, humanPlayer, depthLimit);
         
         if (score < bestScore) {
           bestScore = score;
@@ -246,6 +257,44 @@ const TicTacToe = () => {
       return { score: bestScore, index: bestMove };
     }
   }, [checkWinner, checkDraw]);
+
+  // Evaluate board position for medium difficulty
+  const evaluateBoard = (board, aiPlayer, humanPlayer) => {
+    // Simple evaluation function for non-terminal states
+    let score = 0;
+    
+    // Check all possible lines
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+      [0, 4, 8], [2, 4, 6] // diagonals
+    ];
+    
+    for (const line of lines) {
+      const [a, b, c] = line;
+      // Check for potential wins/losses
+      if (board[a] === aiPlayer && board[b] === aiPlayer && board[c] === '') score += 10;
+      if (board[a] === aiPlayer && board[b] === '' && board[c] === aiPlayer) score += 10;
+      if (board[a] === '' && board[b] === aiPlayer && board[c] === aiPlayer) score += 10;
+      
+      if (board[a] === humanPlayer && board[b] === humanPlayer && board[c] === '') score -= 15;
+      if (board[a] === humanPlayer && board[b] === '' && board[c] === humanPlayer) score -= 15;
+      if (board[a] === '' && board[b] === humanPlayer && board[c] === humanPlayer) score -= 15;
+    }
+    
+    // Center control
+    if (board[4] === aiPlayer) score += 3;
+    else if (board[4] === humanPlayer) score -= 3;
+    
+    // Corner control
+    const corners = [0, 2, 6, 8];
+    for (const corner of corners) {
+      if (board[corner] === aiPlayer) score += 2;
+      else if (board[corner] === humanPlayer) score -= 2;
+    }
+    
+    return score;
+  };
 
   // Get the best move using minimax
   const getBestMove = useCallback((board, aiPlayer, humanPlayer) => {
@@ -287,14 +336,60 @@ const TicTacToe = () => {
             move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
             break;
             
-          case DIFFICULTY_LEVELS.MEDIUM:
-            // 70% chance to make a smart move, 30% random
-            if (Math.random() < 0.7) {
-              move = getBestMove(board, 'O', 'X');
+          case DIFFICULTY_LEVELS.MEDIUM: {
+            // 85% chance to make a smart move, 15% random
+            if (Math.random() < 0.85) {
+              // Use minimax with a bit more depth for smarter play
+              const { index } = minimax(
+                [...board],
+                0,
+                true,
+                -Infinity,
+                Infinity,
+                'O',
+                'X',
+                false // Don't limit depth as much for medium difficulty
+              );
+              move = index;
+              
+              // 20% chance to make a slightly suboptimal move (reduced from 30%)
+              if (Math.random() < 0.2 && emptyIndices.length > 1) {
+                // Filter out the best move and choose from strategic positions
+                const otherMoves = emptyIndices.filter(i => i !== move);
+                if (otherMoves.length > 0) {
+                  // Prioritize corners, then center, then edges for suboptimal moves
+                  const corners = otherMoves.filter(i => [0, 2, 6, 8].includes(i));
+                  const center = otherMoves.filter(i => i === 4);
+                  const edges = otherMoves.filter(i => [1, 3, 5, 7].includes(i));
+                  
+                  // Choose from the best available positions
+                  const bestMoves = corners.length > 0 ? corners :
+                                  center.length > 0 ? center :
+                                  edges;
+                  
+                  if (bestMoves.length > 0) {
+                    move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+                  }
+                }
+              }
             } else {
-              move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+              // 15% chance to make a semi-random move (but still strategic)
+              const corners = emptyIndices.filter(i => [0, 2, 6, 8].includes(i));
+              const center = emptyIndices.filter(i => i === 4);
+              const edges = emptyIndices.filter(i => [1, 3, 5, 7].includes(i));
+              
+              // 70% chance to choose from corners/center, 30% from edges
+              if ((corners.length > 0 || center.length > 0) && Math.random() < 0.7) {
+                const goodMoves = [...corners, ...center];
+                move = goodMoves[Math.floor(Math.random() * goodMoves.length)];
+              } else if (edges.length > 0) {
+                move = edges[Math.floor(Math.random() * edges.length)];
+              } else {
+                move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+              }
             }
             break;
+          }
             
           case DIFFICULTY_LEVELS.HARD:
           default:
