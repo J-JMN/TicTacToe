@@ -861,14 +861,17 @@ body {
 /* Responsive Design */
 @media (max-width: 640px) {
   :root {
-    --cell-size: 22vw;
+    --cell-size: min(22vw, 80px);
     --board-gap: 0.5rem;
   }
   
   .game {
     padding: var(--spacing-lg);
     border-radius: var(--radius-lg);
-    margin: 1rem;
+    margin: 0 auto;
+    max-width: 100%;
+    width: fit-content;
+    box-sizing: border-box;
   }
   
   h1 {
@@ -876,7 +879,7 @@ body {
   }
   
   .cell {
-    font-size: 2.5rem;
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
   }
   
   .game-button {
