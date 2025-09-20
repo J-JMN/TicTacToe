@@ -67,7 +67,7 @@ const WelcomeModal = ({
             <h1>Welcome to 2D Tic Tac Toe</h1>
             <h2>Ultimate Edition</h2>
             <p className="hero-description">
-              Experience the classic game like never before with stunning 3D visuals, 
+              Experience the classic game like never before with stunning 2D visuals, 
               strategic power-ups, and comprehensive progression systems!
             </p>
           </div>
