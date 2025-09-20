@@ -4396,11 +4396,13 @@ input:checked + .slider:before {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(8px, 2vw, 15px);
-  width: min(90vw, 450px);
+  width: min(85vw, 450px);
   max-width: 450px;
   aspect-ratio: 1;
   margin: 0 auto;
   padding: clamp(15px, 4vw, 35px);
+  justify-items: center;
+  align-items: center;
   background: 
     linear-gradient(135deg, 
       var(--theme-background) 0%,
@@ -4552,16 +4554,18 @@ input:checked + .slider:before {
 }
 
 .power-up-btn-2d {
-  padding: var(--space-sm) var(--space-md);
+  padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
   background: var(--gradient-surface);
   border: 2px solid var(--theme-primary);
-  border-radius: 15px;
+  border-radius: 10px;
   color: var(--theme-primary);
   font-weight: 600;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  min-height: 44px;
 }
 
 .power-up-btn-2d::before {
@@ -4613,18 +4617,31 @@ input:checked + .slider:before {
   margin-top: var(--space-xl);
 }
 
-.game-button-2d {
-  padding: var(--space-md) var(--space-lg);
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.action-btn {
+  padding: var(--space-sm) var(--space-xs);
   background: var(--gradient-button);
   border: none;
-  border-radius: 15px;
+  border-radius: 10px;
   color: white;
   font-weight: 600;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   position: relative;
   overflow: hidden;
+  min-width: 0;
+  text-align: center;
 }
 
 .game-button-2d::before {

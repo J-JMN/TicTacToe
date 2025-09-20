@@ -13,6 +13,7 @@ import CustomizationPanel from './CustomizationPanel.jsx';
 import TutorialSystem from './TutorialSystem.jsx';
 import WelcomeModal from './WelcomeModal.jsx';
 import InteractiveTutorial from './InteractiveTutorial.jsx';
+import '../styles/mobile-fixes.css';
 
 const TicTacToeEnhanced = () => {
   // Game state
@@ -254,13 +255,6 @@ const TicTacToeEnhanced = () => {
 
         {/* Control Panel */}
         <div className="control-panel">
-          {/* Game Info Display */}
-          <div className="control-group game-info">
-            <label>🎮 Game Mode:</label>
-            <div className="mode-display">
-              <span className="active-mode">Tic Tac Toe</span>
-            </div>
-          </div>
 
           {/* Game Settings */}
           <div className="control-group settings-group">
@@ -362,12 +356,7 @@ const TicTacToeEnhanced = () => {
         </div>
 
         {/* Status Bar */}
-        <div className="status-bar">
-          <div className="status-item">
-            <span className="status-icon">🎮</span>
-            <span>Mode: Tic Tac Toe</span>
-          </div>
-          
+        <div className="status-bar">          
           <div className="status-item">
             <span className="status-icon">🎯</span>
             <span>Theme: {currentTheme.name}</span>
