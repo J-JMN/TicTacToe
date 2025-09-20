@@ -235,7 +235,7 @@ const TutorialSystem = ({
 
   return (
     <div className="tutorial-overlay">
-      <div className="tutorial-system">
+      <div className={`tutorial-system ${activeTab === 'reference' ? 'show-tutorial-footer' : ''}`}>
         <div className="tutorial-header">
           <h2>📖 Game Tutorial & Guide</h2>
           <button onClick={onClose} className="close-btn">×</button>

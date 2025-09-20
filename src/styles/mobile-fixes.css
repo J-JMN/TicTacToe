@@ -575,22 +575,42 @@
     margin-top: 20px !important;
   }
   
-  /* Tutorial Footer with Interactive Button */
+  /* Tutorial Footer - Normal positioning to not block navigation */
   .tutorial-footer {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
     padding: 20px !important;
-    background: linear-gradient(to top, 
-      rgba(26, 26, 46, 1) 0%, 
-      rgba(26, 26, 46, 0.95) 100%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
-    z-index: 999 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 10px !important;
+    margin-top: 20px !important;
+    display: none !important; /* Hide by default */
+  }
+  
+  /* Show tutorial footer only on Quick Reference tab (4th tab) */
+  .tutorial-content .quick-reference + .tutorial-footer,
+  .tutorial-content:has(.quick-reference) .tutorial-footer,
+  .tutorial-system[data-active-tab="reference"] .tutorial-footer {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 15px !important;
+  }
+  
+  /* Fallback: Show footer when Quick Reference content is visible */
+  .quick-reference ~ .tutorial-footer,
+  .quick-reference + * .tutorial-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
+  }
+  
+  /* JavaScript-based approach - add class when 4th tab is active */
+  .tutorial-system.show-tutorial-footer .tutorial-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
   }
   
   .interactive-tutorial-btn {
@@ -598,7 +618,7 @@
     visibility: visible !important;
     opacity: 1 !important;
     width: 100% !important;
-    max-width: 320px !important;
+    max-width: 300px !important;
     padding: 15px 20px !important;
     font-size: 1rem !important;
     background: linear-gradient(135deg, 
@@ -609,13 +629,14 @@
     color: white !important;
     font-weight: bold !important;
     cursor: pointer !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.3s ease !important;
+    text-align: center !important;
   }
   
   .interactive-tutorial-btn:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4) !important;
   }
   
   .interactive-tutorial-btn:active {
@@ -627,7 +648,8 @@
     color: var(--text-dim) !important;
     text-align: center !important;
     margin: 0 !important;
-    padding: 0 10px !important;
+    padding: 0 15px !important;
+    line-height: 1.4 !important;
   }
   
   /* Tutorial tabs specific */
