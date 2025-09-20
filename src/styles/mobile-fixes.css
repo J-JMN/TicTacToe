@@ -234,20 +234,21 @@
     border-color: var(--theme-primary) !important;
   }
   
-  /* Make Achievements tab full width on bottom row */
+  /* Make Achievements tab full width on bottom row with theme colors */
   .stats-tabs .tab:nth-child(4) {
     flex: 1 1 100% !important;
     font-weight: bold !important;
     background: linear-gradient(135deg, 
-      rgba(255, 215, 0, 0.1) 0%, 
-      rgba(255, 215, 0, 0.2) 100%) !important;
-    border-color: rgba(255, 215, 0, 0.3) !important;
+      rgba(var(--theme-primary-rgb), 0.1) 0%, 
+      rgba(var(--theme-secondary-rgb), 0.2) 100%) !important;
+    border-color: var(--theme-primary) !important;
   }
   
   .stats-tabs .tab:nth-child(4).active {
     background: linear-gradient(135deg, 
-      rgba(255, 215, 0, 0.3) 0%, 
-      rgba(255, 215, 0, 0.5) 100%) !important;
+      var(--theme-primary) 0%, 
+      var(--theme-secondary) 100%) !important;
+    color: white !important;
   }
   
   /* Add Achievements as a separate section below tabs */
@@ -277,6 +278,76 @@
     opacity: 1 !important;
     height: auto !important;
     margin-top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  /* Fix Achievements overview/summary container */
+  .achievements-overview,
+  .achievements-summary {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  
+  .achievements-stats,
+  .achievement-summary-stats {
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    width: 100% !important;
+  }
+  
+  .achievement-count,
+  .total-points {
+    text-align: center !important;
+    flex: 1 !important;
+  }
+  
+  .achievement-count h3,
+  .total-points h3 {
+    font-size: 1.5rem !important;
+    margin: 0 0 5px 0 !important;
+    color: var(--theme-primary) !important;
+  }
+  
+  .achievement-count p,
+  .total-points p {
+    font-size: 0.8rem !important;
+    margin: 0 !important;
+    color: var(--text-dim) !important;
+  }
+  
+  /* Fix progress circle container */
+  .achievement-progress-circle {
+    width: 80px !important;
+    height: 80px !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .progress-ring {
+    transform: rotate(-90deg) !important;
+  }
+  
+  .progress-text {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
+    color: var(--theme-primary) !important;
+    text-align: center !important;
   }
   
   .achievement-grid {
@@ -284,7 +355,9 @@
     grid-template-columns: 1fr !important;
     gap: 12px !important;
     width: 100% !important;
+    max-width: 100% !important;
     padding: 10px !important;
+    box-sizing: border-box !important;
   }
   
   .achievement-card {
