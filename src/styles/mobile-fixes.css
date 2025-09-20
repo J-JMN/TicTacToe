@@ -3,21 +3,50 @@
    =========================== */
 
 @media (max-width: 768px) {
-  /* 1. Fix action buttons to be evenly sized */
+  /* 1. Fix action buttons to be evenly sized and theme-aligned */
   .action-buttons {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
     width: 100% !important;
+    padding: 0 !important;
+    margin-top: 10px !important;
   }
   
   .action-btn {
     min-width: 0 !important;
-    padding: 10px 8px !important;
+    padding: 12px 8px !important;
     font-size: 0.75rem !important;
     width: 100% !important;
-    height: 100% !important;
-    aspect-ratio: 2/1 !important;
+    height: 48px !important;
+    aspect-ratio: unset !important;
+    background: linear-gradient(135deg, 
+      var(--theme-primary) 0%, 
+      var(--theme-secondary) 100%) !important;
+    border: 1px solid var(--theme-primary) !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .action-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.3) !important;
+  }
+  
+  .action-btn:active {
+    transform: translateY(0) !important;
+  }
+  
+  .action-btn span {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
   }
   
   /* 2. Center game board tiles properly */
@@ -74,6 +103,11 @@
   .custom-symbols-section {
     padding: 15px !important;
     width: 100% !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 10px !important;
+    margin-top: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-sizing: border-box !important;
   }
   
   .custom-symbol-inputs {
@@ -81,6 +115,7 @@
     flex-direction: column !important;
     gap: 10px !important;
     width: 100% !important;
+    padding: 0 !important;
   }
   
   .symbol-input-group {
@@ -89,19 +124,28 @@
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
+    padding: 8px !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 8px !important;
   }
   
   .symbol-input-group label {
     flex: 0 0 auto !important;
     margin-right: 10px !important;
     font-size: 0.85rem !important;
+    min-width: 120px !important;
   }
   
   .symbol-input {
     flex: 1 !important;
-    max-width: 100px !important;
+    max-width: 80px !important;
     padding: 8px !important;
     font-size: 1rem !important;
+    background: var(--surface) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 5px !important;
+    color: white !important;
+    text-align: center !important;
   }
   
   .use-custom-btn {
@@ -158,28 +202,81 @@
     color: var(--theme-primary) !important;
   }
   
-  /* 7. Fix Achievements section visibility */
-  .stats-dashboard .modal-body {
-    display: flex !important;
-    flex-direction: column !important;
+  /* 7. Fix Achievements section - Make tabs wrap and visible */
+  .stats-dashboard {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
   }
   
   .stats-tabs {
-    order: 1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
     margin-bottom: 20px !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+    padding-bottom: 0 !important;
+    gap: 5px !important;
   }
   
-  .stats-tab-content.overview {
-    order: 2 !important;
+  .stats-tabs .tab {
+    flex: 1 1 45% !important;
+    min-width: 0 !important;
+    padding: 10px 5px !important;
+    font-size: 0.7rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 5px !important;
+    margin-bottom: 5px !important;
+  }
+  
+  .stats-tabs .tab.active {
+    background: var(--theme-primary) !important;
+    border-color: var(--theme-primary) !important;
+  }
+  
+  /* Make Achievements tab full width on bottom row */
+  .stats-tabs .tab:nth-child(4) {
+    flex: 1 1 100% !important;
+    font-weight: bold !important;
+    background: linear-gradient(135deg, 
+      rgba(255, 215, 0, 0.1) 0%, 
+      rgba(255, 215, 0, 0.2) 100%) !important;
+    border-color: rgba(255, 215, 0, 0.3) !important;
+  }
+  
+  .stats-tabs .tab:nth-child(4).active {
+    background: linear-gradient(135deg, 
+      rgba(255, 215, 0, 0.3) 0%, 
+      rgba(255, 215, 0, 0.5) 100%) !important;
+  }
+  
+  /* Add Achievements as a separate section below tabs */
+  .stats-dashboard .achievements-section,
+  .achievements-container {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+    padding: 15px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+  
+  .achievements-header {
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    margin-bottom: 15px !important;
+    color: var(--theme-primary) !important;
+    text-align: center !important;
   }
   
   .stats-tab-content.achievements {
-    order: 3 !important;
     display: block !important;
-    width: 100% !important;
-    margin-top: 30px !important;
-    padding-top: 20px !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    visibility: visible !important;
+    position: relative !important;
+    opacity: 1 !important;
+    height: auto !important;
+    margin-top: 0 !important;
   }
   
   .achievement-grid {
@@ -340,6 +437,76 @@
     z-index: 102 !important;
     background: var(--gradient-primary) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Fix Enhanced Sound Effects toggle alignment */
+  .effect-option {
+    width: 100% !important;
+    padding: 15px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 10px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  .effect-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  
+  .effect-header h4 {
+    flex: 1 !important;
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .toggle-switch {
+    position: relative !important;
+    display: inline-block !important;
+    width: 50px !important;
+    height: 26px !important;
+    flex-shrink: 0 !important;
+    margin-left: 10px !important;
+  }
+  
+  .toggle-switch input {
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  .toggle-switch .slider {
+    position: absolute !important;
+    cursor: pointer !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    transition: 0.4s !important;
+    border-radius: 26px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+  
+  .toggle-switch .slider:before {
+    position: absolute !important;
+    content: "" !important;
+    height: 20px !important;
+    width: 20px !important;
+    left: 3px !important;
+    bottom: 3px !important;
+    background-color: white !important;
+    transition: 0.4s !important;
+    border-radius: 50% !important;
+  }
+  
+  .toggle-switch input:checked + .slider {
+    background-color: var(--theme-primary) !important;
+  }
+  
+  .toggle-switch input:checked + .slider:before {
+    transform: translateX(24px) !important;
   }
   
   /* Additional mobile optimizations */
