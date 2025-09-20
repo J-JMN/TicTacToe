@@ -124,6 +124,21 @@ const TutorialSystem = ({
             Next →
           </button>
         </div>
+        
+        {/* Show Start Interactive Tutorial button on last step */}
+        {currentStep === currentSteps.length - 1 && (
+          <div className="tutorial-start-section">
+            <button 
+              onClick={startInteractiveTutorial}
+              className="interactive-tutorial-btn inline"
+            >
+              🎮 Start Interactive Tutorial
+            </button>
+            <p className="tutorial-tip">
+              💡 Tip: The interactive tutorial will guide you through a real game with step-by-step instructions!
+            </p>
+          </div>
+        )}
       </div>
     );
   };

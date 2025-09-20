@@ -559,6 +559,57 @@
     text-align: center !important;
   }
   
+  /* Tutorial Start Section - Inline with step content */
+  .tutorial-start-section {
+    margin-top: 25px !important;
+    padding: 20px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+  
+  .interactive-tutorial-btn.inline {
+    display: block !important;
+    width: 100% !important;
+    max-width: 280px !important;
+    padding: 15px 20px !important;
+    font-size: 1rem !important;
+    background: linear-gradient(135deg, 
+      var(--theme-primary) 0%, 
+      var(--theme-secondary) 100%) !important;
+    border: 2px solid var(--theme-primary) !important;
+    border-radius: 10px !important;
+    color: white !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+  }
+  
+  .interactive-tutorial-btn.inline:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+  }
+  
+  .interactive-tutorial-btn.inline:active {
+    transform: translateY(0) !important;
+  }
+  
+  .tutorial-start-section .tutorial-tip {
+    font-size: 0.8rem !important;
+    color: var(--text-dim) !important;
+    text-align: center !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    line-height: 1.4 !important;
+  }
+  
   .tutorial-navigation {
     position: fixed !important;
     bottom: 0 !important;
