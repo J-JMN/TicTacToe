@@ -510,13 +510,53 @@
     transition: width 0.5s ease !important;
   }
   
-  /* 9. Fix Tutorial start button position */
+  /* 9. Fix Tutorial start button position and step navigation */
   .tutorial-system .modal-body {
-    padding-bottom: 100px !important;
+    padding-bottom: 20px !important;
   }
   
   .tutorial-content {
-    padding-bottom: 100px !important;
+    padding-bottom: 20px !important;
+  }
+  
+  /* Fix step-by-step navigation visibility */
+  .step-navigation {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 15px 0 !important;
+    margin-top: 20px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    gap: 10px !important;
+  }
+  
+  .nav-btn {
+    padding: 10px 15px !important;
+    background: var(--gradient-surface) !important;
+    border: 1px solid var(--theme-primary) !important;
+    border-radius: 8px !important;
+    color: var(--theme-primary) !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    min-width: 80px !important;
+  }
+  
+  .nav-btn:hover:not(:disabled) {
+    background: var(--theme-primary) !important;
+    color: white !important;
+  }
+  
+  .nav-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+  
+  .step-counter {
+    font-size: 0.8rem !important;
+    color: var(--text-dim) !important;
+    flex: 1 !important;
+    text-align: center !important;
   }
   
   .tutorial-navigation {
@@ -575,7 +615,7 @@
     margin-top: 20px !important;
   }
   
-  /* Tutorial Footer - Normal positioning to not block navigation */
+  /* Tutorial Footer - Show only on last step of Overview OR on Quick Reference tab */
   .tutorial-footer {
     position: relative !important;
     padding: 20px !important;
@@ -586,27 +626,28 @@
     display: none !important; /* Hide by default */
   }
   
-  /* Show tutorial footer only on Quick Reference tab (4th tab) */
+  /* Show footer on last step of Overview (step 4) */
+  .step-by-step:has(.nav-btn.next:disabled) .tutorial-footer,
+  .tutorial-system[data-current-step="3"] .tutorial-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
+  }
+  
+  /* Show tutorial footer on Quick Reference tab OR when on last Overview step */
   .tutorial-content .quick-reference + .tutorial-footer,
   .tutorial-content:has(.quick-reference) .tutorial-footer,
-  .tutorial-system[data-active-tab="reference"] .tutorial-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 15px !important;
-  }
-  
-  /* Fallback: Show footer when Quick Reference content is visible */
-  .quick-reference ~ .tutorial-footer,
-  .quick-reference + * .tutorial-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 15px !important;
-  }
-  
-  /* JavaScript-based approach - add class when 4th tab is active */
+  .tutorial-system[data-active-tab="reference"] .tutorial-footer,
   .tutorial-system.show-tutorial-footer .tutorial-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
+  }
+  
+  /* Show on last step of tutorial within Overview tab */
+  .tutorial-system.show-last-step-button .tutorial-footer {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;

@@ -233,9 +233,12 @@ const TutorialSystem = ({
 
   if (!isOpen) return null;
 
+  const isLastStep = currentStep === currentSteps.length - 1;
+  const showFooterOnOverview = activeTab === 'overview' && isLastStep;
+  
   return (
     <div className="tutorial-overlay">
-      <div className={`tutorial-system ${activeTab === 'reference' ? 'show-tutorial-footer' : ''}`}>
+      <div className={`tutorial-system ${activeTab === 'reference' ? 'show-tutorial-footer' : ''} ${showFooterOnOverview ? 'show-last-step-button' : ''}`}>
         <div className="tutorial-header">
           <h2>📖 Game Tutorial & Guide</h2>
           <button onClick={onClose} className="close-btn">×</button>
