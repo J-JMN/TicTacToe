@@ -64,7 +64,7 @@ const WelcomeModal = ({
         <div className="welcome-modal-content">
           <div className="welcome-hero">
             <div className="hero-icon">🎮</div>
-            <h1>Welcome to 3D Tic Tac Toe</h1>
+            <h1>Welcome to 2D Tic Tac Toe</h1>
             <h2>Ultimate Edition</h2>
             <p className="hero-description">
               Experience the classic game like never before with stunning 3D visuals, 
@@ -85,7 +85,7 @@ const WelcomeModal = ({
               <div className="feature-item">
                 <div className="feature-icon">🌟</div>
                 <div className="feature-text">
-                  <strong>Stunning 3D Visuals</strong>
+                  <strong>Stunning 2D Visuals</strong>
                   <p>Immersive graphics with particle effects</p>
                 </div>
               </div>
@@ -101,7 +101,6 @@ const WelcomeModal = ({
               <div className="feature-item">
                 <div className="feature-icon">🎯</div>
                 <div className="feature-text">
-                  <strong>Multiple Game Modes</strong>
                   <p>Spectacular 2D with floating boards and particle effects</p>
                 </div>
               </div>
