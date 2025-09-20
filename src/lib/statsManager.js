@@ -59,10 +59,10 @@ export class StatsManager {
           longest: 0
         },
         byDifficulty: {
-          easy: { played: 0, won: 0 },
-          medium: { played: 0, won: 0 },
-          hard: { played: 0, won: 0 },
-          nightmare: { played: 0, won: 0 }
+          easy: { played: 0, won: 0, lost: 0 },
+          medium: { played: 0, won: 0, lost: 0 },
+          hard: { played: 0, won: 0, lost: 0 },
+          nightmare: { played: 0, won: 0, lost: 0 }
         }
       },
       gamesVsLocal: {
@@ -80,10 +80,10 @@ export class StatsManager {
         tictactoe: { played: 0, won: 0, vsAI: 0, vsLocal: 0 }
       },
       gamesByDifficulty: {
-        easy: { played: 0, won: 0 },
-        medium: { played: 0, won: 0 },
-        hard: { played: 0, won: 0 },
-        nightmare: { played: 0, won: 0 }
+        easy: { played: 0, won: 0, lost: 0 },
+        medium: { played: 0, won: 0, lost: 0 },
+        hard: { played: 0, won: 0, lost: 0 },
+        nightmare: { played: 0, won: 0, lost: 0 }
       },
       powerUpsUsed: {
         freeze: 0,
@@ -108,10 +108,38 @@ export class StatsManager {
       },
       // Additional stats for achievements
       fastWins: 0,
+      fastWins20: 0,
       fastWins30: 0,
       perfectGames: 0,
       comebackWins: 0,
-      tutorialsCompleted: 0
+      tutorialsCompleted: 0,
+      
+      // New tracking for missing achievements
+      centerWins: 0,
+      cornerStarts: 0,
+      diagonalWins: 0,
+      horizontalWins: 0,
+      verticalWins: 0,
+      finalMoveWins: 0,
+      fiveMoveWins: 0,
+      threeMoveWins: 0,
+      flawlessVictories: 0,
+      
+      // Customization tracking
+      themesChanged: 0,
+      symbolsChanged: 0,
+      
+      // Daily tracking
+      lastPlayedDate: null,
+      consecutiveDays: 0,
+      longestDailyStreak: 0,
+      
+      // Local multiplayer tracking
+      localGamesPlayed: 0,
+      localGamesWon: 0,
+      
+      // Achievement tracking
+      achievementsUnlocked: 0
     };
   }
 
@@ -125,7 +153,13 @@ export class StatsManager {
       moves, 
       powerUpsUsed = [],
       isPlayerWin,
-      isAgainstAI = true
+      isAgainstAI = true,
+      winPattern = null, // 'horizontal', 'vertical', 'diagonal'
+      finalMove = false,
+      comebackWin = false,
+      firstMove = null, // position of first move
+      centerControlled = false,
+      flawlessVictory = false
     } = result;
 
     // Ensure stats are properly initialized
@@ -174,6 +208,17 @@ export class StatsManager {
       this.stats.sessionStats.gamesVsLocal++;
     }
 
+    // Track daily login
+    this.updateDailyStreak();
+    
+    // Track local multiplayer
+    if (!isAgainstAI) {
+      this.stats.localGamesPlayed++;
+      if (isPlayerWin) {
+        this.stats.localGamesWon++;
+      }
+    }
+    
     // Update game outcome
     if (winner === null) {
       this.stats.totalDraws++;
@@ -195,11 +240,56 @@ export class StatsManager {
         targetStats.streaks.longest, 
         targetStats.streaks.current
       );
+      
+      // Track win patterns
+      if (winPattern === 'horizontal') {
+        this.stats.horizontalWins++;
+      } else if (winPattern === 'vertical') {
+        this.stats.verticalWins++;
+      } else if (winPattern === 'diagonal') {
+        this.stats.diagonalWins++;
+      }
+      
+      // Track special wins
+      if (centerControlled) {
+        this.stats.centerWins++;
+      }
+      if (finalMove) {
+        this.stats.finalMoveWins++;
+      }
+      if (comebackWin) {
+        this.stats.comebackWins++;
+      }
+      if (moves === 5) {
+        this.stats.fiveMoveWins++;
+      }
+      if (moves === 3) {
+        this.stats.threeMoveWins++;
+      }
+      if (flawlessVictory) {
+        this.stats.flawlessVictories++;
+      }
     } else {
       this.stats.totalLosses++;
       targetStats.totalLosses++;
       this.stats.streaks.current = 0;
       targetStats.streaks.current = 0;
+      
+      // Track losses by difficulty
+      if (isAgainstAI && this.stats.gamesByDifficulty[difficulty]) {
+        this.stats.gamesByDifficulty[difficulty].lost++;
+        if (targetStats.byDifficulty && targetStats.byDifficulty[difficulty]) {
+          targetStats.byDifficulty[difficulty].lost++;
+        }
+      }
+    }
+    
+    // Track first move position
+    if (firstMove !== null) {
+      // Check if corner (0, 2, 6, 8)
+      if ([0, 2, 6, 8].includes(firstMove)) {
+        this.stats.cornerStarts++;
+      }
     }
 
     // Update mode stats
@@ -243,11 +333,14 @@ export class StatsManager {
 
     // Track additional achievement stats
     if (isPlayerWin) {
-      // Track fast wins (under 30 seconds)
+      // Track fast wins
       if (duration && duration < 30000) {
-        this.stats.fastWins++;
-        if (duration < 15000) {
-          this.stats.fastWins30++; // Very fast wins under 15 seconds
+        this.stats.fastWins30++;
+        if (duration < 20000) {
+          this.stats.fastWins20++;
+          if (duration < 15000) {
+            this.stats.fastWins++;
+          }
         }
       }
       
@@ -285,6 +378,48 @@ export class StatsManager {
     this.saveStats();
     
     // Check for tutorial-related achievements
+    const newAchievements = this.checkAchievements();
+    return newAchievements;
+  }
+  
+  // Update daily streak tracking
+  updateDailyStreak() {
+    const today = new Date().toDateString();
+    const lastPlayed = this.stats.lastPlayedDate ? new Date(this.stats.lastPlayedDate).toDateString() : null;
+    
+    if (lastPlayed !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayString = yesterday.toDateString();
+      
+      if (lastPlayed === yesterdayString) {
+        // Consecutive day!
+        this.stats.consecutiveDays++;
+        this.stats.longestDailyStreak = Math.max(this.stats.longestDailyStreak, this.stats.consecutiveDays);
+      } else {
+        // Streak broken or first time playing
+        this.stats.consecutiveDays = 1;
+        if (!this.stats.longestDailyStreak) {
+          this.stats.longestDailyStreak = 1;
+        }
+      }
+      
+      this.stats.lastPlayedDate = today;
+    }
+  }
+  
+  // Record theme change
+  recordThemeChange() {
+    this.stats.themesChanged = (this.stats.themesChanged || 0) + 1;
+    this.saveStats();
+    const newAchievements = this.checkAchievements();
+    return newAchievements;
+  }
+  
+  // Record symbol change
+  recordSymbolChange() {
+    this.stats.symbolsChanged = (this.stats.symbolsChanged || 0) + 1;
+    this.saveStats();
     const newAchievements = this.checkAchievements();
     return newAchievements;
   }
@@ -340,7 +475,7 @@ export class StatsManager {
                      this.stats.averageTimePerGame <= req.value * 1000; // Convert to ms
           break;
         case 'fast_wins':
-          unlocked = (this.stats.fastWins || 0) >= req.value;
+          unlocked = (this.stats.fastWins20 || 0) >= req.value;
           break;
         case 'fast_wins_30':
           unlocked = (this.stats.fastWins30 || 0) >= req.value;
@@ -406,6 +541,65 @@ export class StatsManager {
         case 'tutorials_completed':
           unlocked = (this.stats.tutorialsCompleted || 0) >= req.value;
           break;
+        
+        // New achievement checks
+        case 'total_draws':
+          unlocked = (this.stats.totalDraws || 0) >= req.value;
+          break;
+        case 'total_losses':
+          unlocked = (this.stats.totalLosses || 0) >= req.value;
+          break;
+        case 'ai_hard_losses':
+          unlocked = (this.stats.gamesByDifficulty?.hard?.lost || 0) >= req.value;
+          break;
+        case 'ai_nightmare_losses':
+          unlocked = (this.stats.gamesByDifficulty?.nightmare?.lost || 0) >= req.value;
+          break;
+        case 'center_wins':
+          unlocked = (this.stats.centerWins || 0) >= req.value;
+          break;
+        case 'corner_starts':
+          unlocked = (this.stats.cornerStarts || 0) >= req.value;
+          break;
+        case 'diagonal_wins':
+          unlocked = (this.stats.diagonalWins || 0) >= req.value;
+          break;
+        case 'horizontal_wins':
+          unlocked = (this.stats.horizontalWins || 0) >= req.value;
+          break;
+        case 'vertical_wins':
+          unlocked = (this.stats.verticalWins || 0) >= req.value;
+          break;
+        case 'comeback_wins':
+          unlocked = (this.stats.comebackWins || 0) >= req.value;
+          break;
+        case 'final_move_wins':
+          unlocked = (this.stats.finalMoveWins || 0) >= req.value;
+          break;
+        case 'five_move_wins':
+          unlocked = (this.stats.fiveMoveWins || 0) >= req.value;
+          break;
+        case 'three_move_wins':
+          unlocked = (this.stats.threeMoveWins || 0) >= req.value;
+          break;
+        case 'local_games':
+          unlocked = (this.stats.localGamesPlayed || 0) >= req.value;
+          break;
+        case 'local_wins':
+          unlocked = (this.stats.localGamesWon || 0) >= req.value;
+          break;
+        case 'daily_streak':
+          unlocked = (this.stats.longestDailyStreak || 0) >= req.value;
+          break;
+        case 'themes_changed':
+          unlocked = (this.stats.themesChanged || 0) >= req.value;
+          break;
+        case 'symbols_changed':
+          unlocked = (this.stats.symbolsChanged || 0) >= req.value;
+          break;
+        case 'achievements_unlocked':
+          unlocked = (this.stats.achievementsUnlocked || 0) >= req.value;
+          break;
         // Legacy cases for backward compatibility
         case 'first_win':
           unlocked = this.stats.totalWins >= 1;
@@ -437,6 +631,7 @@ export class StatsManager {
         };
         this.stats.achievements.unlocked++;
         this.stats.achievements.totalPoints += achievement.points;
+        this.stats.achievementsUnlocked = (this.stats.achievementsUnlocked || 0) + 1;
         newAchievements.push(achievement);
 
         // Check for theme unlocks

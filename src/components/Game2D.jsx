@@ -20,10 +20,10 @@ const Game2D = ({
   const [board, setBoard] = useState(Array(9).fill(''));
   const [isXNext, setIsXNext] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const [winner, setWinner] = useState(null);
-  const [winningLine, setWinningLine] = useState([]);
-  const [gameStartTime, setGameStartTime] = useState(Date.now());
   const [moveCount, setMoveCount] = useState(0);
+  const [showGameResultModal, setShowGameResultModal] = useState(false);
+  const [gameStartTime, setGameStartTime] = useState(Date.now());
+  const [moveHistory, setMoveHistory] = useState([]);
 
   // Power-ups state - availability depends on difficulty and loss count
   const getInitialPowerUps = () => {
@@ -100,7 +100,6 @@ const Game2D = ({
   const [frozenTurns, setFrozenTurns] = useState(0);
   const [doubleMoveActive, setDoubleMoveActive] = useState(false);
   const [usedPowerUps, setUsedPowerUps] = useState([]);
-  const [showGameResultModal, setShowGameResultModal] = useState(false);
 
   // AI timeout ref
   const aiMoveTimeout = useRef(null);
@@ -266,6 +265,7 @@ const Game2D = ({
     newBoard[index] = currentPlayer;
     setBoard(newBoard);
     setMoveCount(prev => prev + 1);
+    setMoveHistory(prev => [...prev, index]);
 
     // Record move for heat map
     statsManager.recordMove(index);
@@ -298,6 +298,42 @@ const Game2D = ({
     setWinningLine(cells || []);
 
     const duration = Date.now() - gameStartTime;
+    
+    // Determine win pattern if there's a winner
+    let winPattern = null;
+    if (gameWinner && cells) {
+      // Check if horizontal (rows 0-2, 3-5, 6-8)
+      if (cells.every(c => Math.floor(c / 3) === Math.floor(cells[0] / 3))) {
+        winPattern = 'horizontal';
+      }
+      // Check if vertical (columns 0,3,6 / 1,4,7 / 2,5,8)
+      else if (cells.every(c => c % 3 === cells[0] % 3)) {
+        winPattern = 'vertical';
+      }
+      // Otherwise diagonal
+      else {
+        winPattern = 'diagonal';
+      }
+    }
+    
+    // Check if center was controlled by winner
+    const centerControlled = gameWinner && board[4] === gameWinner;
+    
+    // Check if this is a final move win (board was nearly full)
+    const filledCells = board.filter(cell => cell !== null).length;
+    const finalMove = gameWinner && filledCells >= 8;
+    
+    // Check for flawless victory (opponent has no marks)
+    const opponentSymbol = gameWinner === 'X' ? 'O' : 'X';
+    const flawlessVictory = gameWinner && !board.includes(opponentSymbol);
+    
+    // Get first move position (for corner tracking)
+    const firstMove = moveHistory && moveHistory.length > 0 ? moveHistory[0] : null;
+    
+    // Check for comeback win (would need to track if opponent was close to winning)
+    // This is simplified - ideally track if opponent had 2 in a row at some point
+    const comebackWin = false; // TODO: Implement proper comeback detection
+    
     const result = {
       winner: gameWinner,
       draw: !gameWinner,
@@ -307,7 +343,13 @@ const Game2D = ({
       moves: moveCount,
       powerUpsUsed: usedPowerUps,
       isPlayerWin: gameWinner === 'X', // Assuming X is always player
-      isAgainstAI: true
+      isAgainstAI: true,
+      winPattern,
+      finalMove,
+      comebackWin,
+      firstMove,
+      centerControlled,
+      flawlessVictory
     };
 
     if (onGameEnd) {
@@ -648,6 +690,7 @@ const Game2D = ({
     setWinningLine([]);
     setGameStartTime(Date.now());
     setMoveCount(0);
+    setMoveHistory([]);
     setActivePowerUp(null);
     setShieldedCells(new Set());
     setFrozenTurns(0);

@@ -131,6 +131,9 @@ const TicTacToeEnhanced = () => {
   const handleThemeChange = useCallback((theme) => {
     setCurrentTheme(theme);
     
+    // Track theme change for achievements
+    statsManager.recordThemeChange();
+    
     // Apply theme to document
     const root = document.documentElement;
     Object.entries(theme.colors).forEach(([key, value]) => {
@@ -145,6 +148,10 @@ const TicTacToeEnhanced = () => {
   // Handle symbol change
   const handleSymbolChange = useCallback((symbols) => {
     setCurrentSymbols(symbols);
+    
+    // Track symbol change for achievements
+    statsManager.recordSymbolChange();
+    
     if (soundEnabled) {
       playSound('click');
     }
