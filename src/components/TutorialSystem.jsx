@@ -7,7 +7,7 @@ const TutorialSystem = ({
   isOpen, 
   onClose, 
   currentTheme, 
-  gameMode = GAME_MODES.CLASSIC_2D, 
+  gameMode = GAME_MODES.TICTACTOE, 
   onStartTutorial,
   playSound,
   soundEnabled = true 
@@ -15,12 +15,12 @@ const TutorialSystem = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Tutorial content for 2D mode only
+  // Tutorial content for Tic Tac Toe mode
   const tutorialSteps = {
-    [GAME_MODES.CLASSIC_2D]: [
+    [GAME_MODES.TICTACTOE]: [
       {
-        title: "Welcome to Spectacular Tic Tac Toe!",
-        description: "The ultimate 2D Tic Tac Toe experience with power-ups and stunning visuals.",
+        title: "Welcome to Tic Tac Toe!",
+        description: "The ultimate Tic Tac Toe experience with power-ups and stunning visuals.",
         image: "🎯",
         details: [
           "Traditional 3x3 grid with enhanced graphics",
@@ -209,7 +209,7 @@ const TutorialSystem = ({
         </div>
         <div className="reference-item">
           <h4>⚡ Power-up Cooldowns</h4>
-          <p>Each ability has a 2-3 turn cooldown</p>
+          <p>Each ability has a 6 second cooldown</p>
         </div>
         <div className="reference-item">
           <h4>🤖 AI Difficulties</h4>
@@ -280,7 +280,7 @@ const TutorialSystem = ({
             onClick={startInteractiveTutorial}
             className="interactive-tutorial-btn"
           >
-            🎮 Start Interactive Tutorial for Classic 2D
+            🎮 Start Interactive Tutorial
           </button>
           <p className="tutorial-tip">
             💡 Tip: The interactive tutorial will guide you through a real game with step-by-step instructions!

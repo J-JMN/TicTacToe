@@ -1,5 +1,7 @@
 // Audio context for better sound management
 let audioContext = null;
+let backgroundMusicNode = null;
+let backgroundMusicGain = null;
 
 // Sound effects for the game - using Web Audio API to generate sounds
 export const sounds = {
@@ -116,6 +118,85 @@ export const preloadSounds = async () => {
     console.log('Audio system initialized successfully');
   } catch (error) {
     console.warn('Audio initialization failed:', error);
+  }
+};
+
+// Background music functions
+export const startBackgroundMusic = async () => {
+  try {
+    if (!audioContext) {
+      initAudioContext();
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+    }
+
+    if (backgroundMusicNode) {
+      stopBackgroundMusic();
+    }
+
+    // Create oscillators for ambient background music
+    const frequencies = [220, 330, 440, 550]; // A3, E4, A4, C#5
+    const oscillators = [];
+    
+    backgroundMusicGain = audioContext.createGain();
+    backgroundMusicGain.connect(audioContext.destination);
+    backgroundMusicGain.gain.setValueAtTime(0.05, audioContext.currentTime); // Very low volume
+
+    frequencies.forEach((freq, index) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      
+      osc.connect(gain);
+      gain.connect(backgroundMusicGain);
+      
+      osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+      osc.type = 'sine';
+      
+      // Create a slow fade in/out pattern
+      gain.gain.setValueAtTime(0, audioContext.currentTime);
+      const fadeTime = 4 + index * 2; // Stagger the fade times
+      
+      // Start the oscillator
+      osc.start(audioContext.currentTime);
+      
+      // Create periodic fade in/out
+      const fadeIn = () => {
+        gain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + fadeTime);
+        gain.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + fadeTime * 2);
+        setTimeout(fadeIn, fadeTime * 2000);
+      };
+      
+      setTimeout(fadeIn, index * 1000);
+      oscillators.push(osc);
+    });
+
+    backgroundMusicNode = oscillators;
+  } catch (error) {
+    console.warn('Failed to start background music:', error);
+  }
+};
+
+export const stopBackgroundMusic = () => {
+  if (backgroundMusicNode && Array.isArray(backgroundMusicNode)) {
+    backgroundMusicNode.forEach(osc => {
+      try {
+        osc.stop();
+      } catch (e) {
+        // Already stopped
+      }
+    });
+    backgroundMusicNode = null;
+  }
+  if (backgroundMusicGain) {
+    backgroundMusicGain.disconnect();
+    backgroundMusicGain = null;
+  }
+};
+
+export const setBackgroundMusicVolume = (volume) => {
+  if (backgroundMusicGain) {
+    backgroundMusicGain.gain.setValueAtTime(volume * 0.05, audioContext.currentTime);
   }
 };
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { THEMES } from '../lib/gameTypes.js';
 import { statsManager } from '../lib/statsManager.js';
+import { startBackgroundMusic, stopBackgroundMusic } from '../app/sounds.js';
 
 const CustomizationPanel = ({ 
   isOpen, 
@@ -22,6 +23,7 @@ const CustomizationPanel = ({
   });
   const [symbolType, setSymbolType] = useState('classic');
   const [previewTheme, setPreviewTheme] = useState(null);
+  const [backgroundMusicEnabled, setBackgroundMusicEnabled] = useState(false);
 
   // Symbol options
   const symbolOptions = {
@@ -43,6 +45,12 @@ const CustomizationPanel = ({
       setUnlockedThemes(statsManager.getUnlockedThemes());
       if (currentSymbols) {
         setCustomSymbols(currentSymbols);
+      }
+      
+      // Load background music preference
+      const savedMusicState = localStorage.getItem('background_music_enabled');
+      if (savedMusicState !== null) {
+        setBackgroundMusicEnabled(savedMusicState === 'true');
       }
     }
   }, [isOpen, currentSymbols]);
@@ -86,6 +94,24 @@ const CustomizationPanel = ({
     }
   };
 
+  const handleBackgroundMusicToggle = () => {
+    const newState = !backgroundMusicEnabled;
+    setBackgroundMusicEnabled(newState);
+    
+    if (playSound && soundEnabled) {
+      playSound('click');
+    }
+    
+    if (newState) {
+      startBackgroundMusic();
+    } else {
+      stopBackgroundMusic();
+    }
+    
+    // Save preference to localStorage
+    localStorage.setItem('background_music_enabled', newState.toString());
+  };
+
   const isThemeUnlocked = (themeId) => {
     const theme = THEMES[themeId];
     return theme.unlocked || unlockedThemes.includes(themeId);
@@ -102,8 +128,28 @@ const CustomizationPanel = ({
         return `Unlock ${req.value} achievements`;
       case 'win_streak':
         return `Get a ${req.value} win streak`;
+      case 'total_wins':
+        return `Win ${req.value} total games`;
+      case 'ai_hard_wins':
+        return `Beat Hard AI ${req.value} times`;
+      case 'ai_nightmare_wins':
+        return `Beat Nightmare AI ${req.value} times`;
+      case 'powerups_used':
+        return `Use ${req.value} power-ups`;
+      case 'streak':
+        return `Get a ${req.value} game win streak`;
+      case 'time':
+        return `Win in under ${req.value} seconds`;
+      case 'fast_wins':
+        return `Win ${req.value} fast games`;
+      case 'session_games':
+        return `Play ${req.value} games in one session`;
+      case 'session_wins':
+        return `Win ${req.value} games in one session`;
+      case 'themes_unlocked':
+        return `Unlock ${req.value} themes`;
       default:
-        return 'Complete requirement';
+        return 'Complete special requirement';
     }
   };
 
@@ -284,7 +330,11 @@ const CustomizationPanel = ({
           <div className="effect-header">
             <h4>🎵 Background Music</h4>
             <label className="toggle-switch">
-              <input type="checkbox" />
+              <input 
+                type="checkbox" 
+                checked={backgroundMusicEnabled}
+                onChange={handleBackgroundMusicToggle}
+              />
               <span className="slider"></span>
             </label>
           </div>

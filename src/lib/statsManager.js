@@ -77,9 +77,7 @@ export class StatsManager {
         }
       },
       gamesByMode: {
-        classic_2d: { played: 0, won: 0, vsAI: 0, vsLocal: 0 },
-        classic_3d: { played: 0, won: 0, vsAI: 0, vsLocal: 0 },
-        multi_level_3d: { played: 0, won: 0, vsAI: 0, vsLocal: 0 }
+        tictactoe: { played: 0, won: 0, vsAI: 0, vsLocal: 0 }
       },
       gamesByDifficulty: {
         easy: { played: 0, won: 0 },
@@ -107,7 +105,13 @@ export class StatsManager {
       achievements: {
         unlocked: 0,
         totalPoints: 0
-      }
+      },
+      // Additional stats for achievements
+      fastWins: 0,
+      fastWins30: 0,
+      perfectGames: 0,
+      comebackWins: 0,
+      tutorialsCompleted: 0
     };
   }
 
@@ -237,6 +241,22 @@ export class StatsManager {
       }
     });
 
+    // Track additional achievement stats
+    if (isPlayerWin) {
+      // Track fast wins (under 30 seconds)
+      if (duration && duration < 30000) {
+        this.stats.fastWins++;
+        if (duration < 15000) {
+          this.stats.fastWins30++; // Very fast wins under 15 seconds
+        }
+      }
+      
+      // Track perfect games (won in minimum moves)
+      if (moves <= 5) {
+        this.stats.perfectGames++;
+      }
+    }
+
     // Update calculated stats
     this.updateCalculatedStats();
 
@@ -257,6 +277,16 @@ export class StatsManager {
     if (position >= 0 && position < this.stats.favoritePositions.length) {
       this.stats.favoritePositions[position]++;
     }
+  }
+
+  // Record tutorial completion
+  recordTutorialCompletion() {
+    this.stats.tutorialsCompleted++;
+    this.saveStats();
+    
+    // Check for tutorial-related achievements
+    const newAchievements = this.checkAchievements();
+    return newAchievements;
   }
 
   // Update calculated statistics
@@ -291,8 +321,92 @@ export class StatsManager {
       if (this.achievements[key]) return; // Already unlocked
 
       let unlocked = false;
+      const req = achievement.requirement;
 
-      switch (achievement.id) {
+      if (!req) return; // No requirement defined
+
+      switch (req.type) {
+        case 'total_wins':
+          unlocked = this.stats.totalWins >= req.value;
+          break;
+        case 'total_games':
+          unlocked = this.stats.totalGames >= req.value;
+          break;
+        case 'streak':
+          unlocked = this.stats.streaks.longest >= req.value;
+          break;
+        case 'time':
+          unlocked = this.stats.averageTimePerGame > 0 && 
+                     this.stats.averageTimePerGame <= req.value * 1000; // Convert to ms
+          break;
+        case 'fast_wins':
+          unlocked = (this.stats.fastWins || 0) >= req.value;
+          break;
+        case 'fast_wins_30':
+          unlocked = (this.stats.fastWins30 || 0) >= req.value;
+          break;
+        case 'powerups_used':
+          unlocked = this.stats.totalPowerUpsUsed >= req.value;
+          break;
+        case 'powerup_freeze':
+          unlocked = (this.stats.powerUpsUsed?.freeze || 0) >= req.value;
+          break;
+        case 'powerup_double_move':
+          unlocked = (this.stats.powerUpsUsed?.double_move || 0) >= req.value;
+          break;
+        case 'powerup_steal':
+          unlocked = (this.stats.powerUpsUsed?.steal || 0) >= req.value;
+          break;
+        case 'powerup_bomb':
+          unlocked = (this.stats.powerUpsUsed?.bomb || 0) >= req.value;
+          break;
+        case 'powerup_shield':
+          unlocked = (this.stats.powerUpsUsed?.shield || 0) >= req.value;
+          break;
+        case 'ai_easy_wins':
+          unlocked = (this.stats.gamesVsAI?.byDifficulty?.easy?.won || 0) >= req.value;
+          break;
+        case 'ai_medium_wins':
+          unlocked = (this.stats.gamesVsAI?.byDifficulty?.medium?.won || 0) >= req.value;
+          break;
+        case 'ai_hard_wins':
+          unlocked = (this.stats.gamesVsAI?.byDifficulty?.hard?.won || 0) >= req.value;
+          break;
+        case 'ai_nightmare_wins':
+          unlocked = (this.stats.gamesVsAI?.byDifficulty?.nightmare?.won || 0) >= req.value;
+          break;
+        case 'ai_total_wins':
+          unlocked = (this.stats.gamesVsAI?.totalWins || 0) >= req.value;
+          break;
+        case 'session_games':
+          unlocked = (this.stats.sessionStats?.gamesPlayed || 0) >= req.value;
+          break;
+        case 'session_wins':
+          unlocked = (this.stats.sessionStats?.wins || 0) >= req.value;
+          break;
+        case 'themes_unlocked':
+          unlocked = this.unlockedThemes.length >= req.value;
+          break;
+        case 'all_powerups_used':
+          const allPowerUpsUsed = Object.values(this.stats.powerUpsUsed || {})
+            .every(count => count > 0);
+          unlocked = allPowerUpsUsed && req.value;
+          break;
+        case 'all_powerups_mastery':
+          const masteryCount = Object.values(this.stats.powerUpsUsed || {})
+            .reduce((sum, count) => sum + count, 0);
+          unlocked = masteryCount >= req.value;
+          break;
+        case 'perfect_game':
+          unlocked = (this.stats.perfectGames || 0) >= 1 && req.value;
+          break;
+        case 'comeback_win':
+          unlocked = (this.stats.comebackWins || 0) >= 1 && req.value;
+          break;
+        case 'tutorials_completed':
+          unlocked = (this.stats.tutorialsCompleted || 0) >= req.value;
+          break;
+        // Legacy cases for backward compatibility
         case 'first_win':
           unlocked = this.stats.totalWins >= 1;
           break;
@@ -301,22 +415,18 @@ export class StatsManager {
           break;
         case 'speed_demon':
           unlocked = this.stats.averageTimePerGame > 0 && 
-                     this.stats.averageTimePerGame <= 30000; // 30 seconds
+                     this.stats.averageTimePerGame <= 30000;
           break;
         case 'power_user':
           unlocked = this.stats.totalPowerUpsUsed >= 100;
           break;
-        case '3d_master':
-          unlocked = (this.stats.gamesByMode.classic_3d?.won || 0) + 
-                     (this.stats.gamesByMode.multi_level_3d?.won || 0) >= 50;
-          break;
         case 'giant_slayer':
-          unlocked = (this.stats.gamesByDifficulty.hard?.won || 0) >= 25;
+          unlocked = (this.stats.gamesVsAI?.byDifficulty?.hard?.won || 0) >= 25;
           break;
         case 'strategist':
-          const allPowerUpsUsed = Object.values(this.stats.powerUpsUsed)
+          const allUsed = Object.values(this.stats.powerUpsUsed || {})
             .every(count => count > 0);
-          unlocked = allPowerUpsUsed;
+          unlocked = allUsed;
           break;
       }
 
@@ -396,9 +506,39 @@ export class StatsManager {
     return this.stats;
   }
 
-  // Get achievements
+  // Get all achievements
   getAchievements() {
     return this.achievements;
+  }
+
+  // Calculate player level and progress
+  getPlayerLevel() {
+    const totalPoints = this.stats?.achievements?.totalPoints || 0;
+    
+    // Level calculation: exponential growth
+    // Level 1: 0-99 points, Level 2: 100-299 points, Level 3: 300-599 points, etc.
+    let level = 1;
+    let pointsNeeded = 100; // Points needed for level 2
+    let totalPointsForLevel = 0;
+    
+    while (totalPoints >= totalPointsForLevel + pointsNeeded) {
+      totalPointsForLevel += pointsNeeded;
+      level++;
+      pointsNeeded = Math.floor(pointsNeeded * 1.5); // 50% increase each level
+    }
+    
+    const currentLevelPoints = totalPoints - totalPointsForLevel;
+    const nextLevelPoints = pointsNeeded;
+    const progress = nextLevelPoints > 0 ? (currentLevelPoints / nextLevelPoints) * 100 : 100;
+    
+    return {
+      level,
+      totalPoints,
+      currentLevelPoints,
+      nextLevelPoints,
+      progress: Math.min(progress, 100),
+      pointsToNext: Math.max(nextLevelPoints - currentLevelPoints, 0)
+    };
   }
 
   // Get unlocked themes

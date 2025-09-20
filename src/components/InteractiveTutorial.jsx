@@ -19,12 +19,12 @@ const InteractiveTutorial = ({
   const [completed, setCompleted] = useState(false);
   const [waitingForAction, setWaitingForAction] = useState(false);
 
-  // Tutorial steps for 2D game mode
+  // Tutorial steps for Tic Tac Toe game mode
   const tutorialSteps = {
-    [GAME_MODES.CLASSIC_2D]: [
+    [GAME_MODES.TICTACTOE]: [
       {
         id: 'welcome',
-        title: 'Welcome to 2D Tic Tac Toe!',
+        title: 'Welcome to Tic Tac Toe!',
         description: 'Let\'s learn how to play this enhanced version with power-ups.',
         instruction: 'Click "Next" to continue.',
         highlight: null,
@@ -79,7 +79,7 @@ const InteractiveTutorial = ({
       {
         id: 'completion',
         title: 'Tutorial Complete!',
-        description: 'You\'ve learned the basics of 2D Tic Tac Toe with power-ups.',
+        description: 'You\'ve learned the basics of Tic Tac Toe with power-ups.',
         instruction: 'Click "Complete" to finish the tutorial.',
         highlight: null,
         action: 'complete',
@@ -175,11 +175,27 @@ const InteractiveTutorial = ({
     
     // Check if current tutorial step requirements are met
     switch (currentStepData.action) {
+      case 'click_powerup':
+        // Check if a powerup has been selected
+        if (gameState.activePowerUp) {
+          console.log('Powerup selected, advancing tutorial');
+          setTimeout(() => advanceStep(), 2000); // 2 second delay
+        }
+        break;
+      
       case 'click_cell':
         // Wait for player to make their first move
         if (moveCount === 1 && !isXNext) {
           console.log('Player made first move, advancing tutorial');
-          advanceStep();
+          setTimeout(() => advanceStep(), 2000); // 2 second delay
+        }
+        break;
+      
+      case 'use_powerup':
+        // Check if powerup has been used successfully
+        if (gameState.powerupUsed || (gameState.usedPowerUps && gameState.usedPowerUps.length > 0)) {
+          console.log('Powerup used, advancing tutorial');
+          setTimeout(() => advanceStep(), 2000); // 2 second delay
         }
         break;
       
@@ -187,7 +203,7 @@ const InteractiveTutorial = ({
         // Wait for AI to respond, then advance when it's player's turn again
         if (moveCount >= 2 && isXNext) {
           console.log('AI responded, advancing tutorial');
-          advanceStep();
+          setTimeout(() => advanceStep(), 2000); // 2 second delay
         }
         break;
       

@@ -16,7 +16,7 @@ import InteractiveTutorial from './InteractiveTutorial.jsx';
 
 const TicTacToeEnhanced = () => {
   // Game state
-  const [gameMode, setGameMode] = useState(GAME_MODES.CLASSIC_2D);
+  const [gameMode, setGameMode] = useState(GAME_MODES.TICTACTOE);
   const [currentTheme, setCurrentTheme] = useState(THEMES.NEON);
   const [difficulty, setDifficulty] = useState(DIFFICULTY_LEVELS.MEDIUM);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -151,7 +151,7 @@ const TicTacToeEnhanced = () => {
 
   // Get game mode display name
   const getGameModeDisplayName = (mode) => {
-    return 'Classic 2D';
+    return 'Tic Tac Toe';
   };
 
   // Handle tutorial start
@@ -166,6 +166,12 @@ const TicTacToeEnhanced = () => {
   // Handle tutorial completion
   const handleTutorialComplete = useCallback(() => {
     setInteractiveTutorialMode(false);
+    
+    // Record tutorial completion and check for achievements
+    const tutorialAchievements = statsManager.recordTutorialCompletion();
+    if (tutorialAchievements.length > 0) {
+      setNewAchievements(tutorialAchievements);
+    }
   }, []);
 
   // Game state for tutorial synchronization
@@ -225,8 +231,7 @@ const TicTacToeEnhanced = () => {
                 </div>
               </div>
                   <h1 className="game-title">
-                    <span className="title-spectacular">Spectacular</span> Tic Tac Toe
-                    <span className="title-subtitle">Ultimate 2D Edition</span>
+                    Tic Tac Toe
                   </h1>
             </div>
           </div>
@@ -253,7 +258,7 @@ const TicTacToeEnhanced = () => {
           <div className="control-group game-info">
             <label>🎮 Game Mode:</label>
             <div className="mode-display">
-              <span className="active-mode">Classic 2D</span>
+              <span className="active-mode">Tic Tac Toe</span>
             </div>
           </div>
 
@@ -360,7 +365,7 @@ const TicTacToeEnhanced = () => {
         <div className="status-bar">
           <div className="status-item">
             <span className="status-icon">🎮</span>
-            <span>Mode: {getGameModeDisplayName(gameMode)}</span>
+            <span>Mode: Tic Tac Toe</span>
           </div>
           
           <div className="status-item">
@@ -375,9 +380,27 @@ const TicTacToeEnhanced = () => {
             </div>
           )}
 
-          <div className="status-item">
+          <div className="status-item level-display">
             <span className="status-icon">⚡</span>
-            <span>Level: {Math.floor((gameStats?.achievements?.totalPoints || 0) / 100) + 1}</span>
+            <div className="level-info">
+              {(() => {
+                const levelData = statsManager.getPlayerLevel();
+                return (
+                  <>
+                    <span>Level: {levelData.level}</span>
+                    <div className="level-progress-bar">
+                      <div 
+                        className="level-progress-fill" 
+                        style={{ width: `${levelData.progress}%` }}
+                      ></div>
+                    </div>
+                    <span className="level-progress-text">
+                      {levelData.currentLevelPoints}/{levelData.nextLevelPoints} pts
+                    </span>
+                  </>
+                );
+              })()}
+            </div>
           </div>
         </div>
       </div>
