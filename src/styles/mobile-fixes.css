@@ -224,14 +224,26 @@
     padding: 10px 5px !important;
     font-size: 0.7rem !important;
     background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 5px !important;
     margin-bottom: 5px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .stats-tabs .tab:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--theme-primary) !important;
   }
   
   .stats-tabs .tab.active {
-    background: var(--theme-primary) !important;
+    background: linear-gradient(135deg, 
+      var(--theme-primary) 0%, 
+      var(--theme-secondary) 100%) !important;
     border-color: var(--theme-primary) !important;
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
   }
   
   /* Make Achievements tab full width on bottom row with theme colors */
@@ -285,7 +297,8 @@
   
   /* Fix Achievements overview/summary container */
   .achievements-overview,
-  .achievements-summary {
+  .achievements-summary,
+  .achievements-header-stats {
     width: 100% !important;
     max-width: 100% !important;
     padding: 15px !important;
@@ -295,59 +308,90 @@
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     box-sizing: border-box !important;
     display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    gap: 15px !important;
   }
   
   .achievements-stats,
   .achievement-summary-stats {
     display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
     align-items: center !important;
-    gap: 20px !important;
+    gap: 15px !important;
     width: 100% !important;
   }
   
   .achievement-count,
-  .total-points {
+  .total-points,
+  .achievements-stat {
     text-align: center !important;
     flex: 1 !important;
+    min-width: 0 !important;
   }
   
   .achievement-count h3,
-  .total-points h3 {
-    font-size: 1.5rem !important;
+  .total-points h3,
+  .achievements-stat-value {
+    font-size: clamp(1.2rem, 4vw, 1.5rem) !important;
     margin: 0 0 5px 0 !important;
     color: var(--theme-primary) !important;
+    word-wrap: break-word !important;
   }
   
   .achievement-count p,
-  .total-points p {
-    font-size: 0.8rem !important;
+  .total-points p,
+  .achievements-stat-label {
+    font-size: clamp(0.7rem, 2vw, 0.8rem) !important;
     margin: 0 !important;
     color: var(--text-dim) !important;
+    word-wrap: break-word !important;
   }
   
   /* Fix progress circle container */
-  .achievement-progress-circle {
+  .achievement-progress-circle,
+  .progress-circle-container {
     width: 80px !important;
     height: 80px !important;
     position: relative !important;
     flex-shrink: 0 !important;
+    margin: 0 auto !important;
   }
   
   .progress-ring {
     transform: rotate(-90deg) !important;
   }
   
-  .progress-text {
+  .progress-text,
+  .progress-percentage {
     position: absolute !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    font-size: 0.9rem !important;
+    font-size: clamp(0.8rem, 2.5vw, 1rem) !important;
     font-weight: bold !important;
     color: var(--theme-primary) !important;
     text-align: center !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Fix achievement summary text */
+  .achievements h3,
+  .achievements-title {
+    font-size: clamp(1rem, 3vw, 1.2rem) !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+    color: var(--theme-primary) !important;
+  }
+  
+  .achievements-subtitle,
+  .achievements-description {
+    font-size: clamp(0.7rem, 2vw, 0.85rem) !important;
+    text-align: center !important;
+    color: var(--text-dim) !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
   }
   
   .achievement-grid {
