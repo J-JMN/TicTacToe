@@ -2,6 +2,10 @@
 
 A sophisticated Tic Tac Toe game built with Next.js 15 and React 19, featuring advanced AI opponents, strategic power-ups, local multiplayer, interactive tutorial, real-time statistics, 30+ beautiful unlockable themes, particle effects, sound system, responsive design, smooth animations, 80+ achievements, and data persistence with local storage.
 
+## Game Screenshot
+
+![Game Screenshot](/public/game.png)
+
 ## 🌟 Key Features
 
 ### 🎮 Core Gaming
