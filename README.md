@@ -4,7 +4,9 @@ A sophisticated Tic Tac Toe game built with Next.js 15 and React 19, featuring a
 
 ## Game Screenshot
 
-![Game Screenshot](/public/game.png)
+<div align="center">
+  <img src="/public/game.png" alt="Game Screenshot">
+</div>
 
 ## 🌟 Key Features
 
@@ -55,7 +57,6 @@ A sophisticated Tic Tac Toe game built with Next.js 15 and React 19, featuring a
 | 🔄 Steal | Convert opponent symbol | 4 pts | Same as above |
 | 💥 Bomb | Clear 3x3 area | 5 pts | Same as above |
 | 🛡️ Shield | Protect cell | 3 pts | Same as above |
-| ⏰ Time Warp | Undo last 2 moves | 6 pts | Same as above |
 
 ### Achievement Categories
 - **Victories**: First Win → Mythical Master (500 wins)
